@@ -290,3 +290,4 @@ jobs:
           git -C job_log add .
           git -C job_log commit --amend --no-edit
           git -C job_log push -f https://shinchiro:$GH_TOKEN@gist.github.com/90308c6632c9010d03b325c9ca6a4b6f
+# re-register
