@@ -96,6 +96,14 @@ jobs:
         continue-on-error: true
         run: ${{ github.event.inputs.command }}
 
+      - name: Upgrading meson (container image ships <1.3.0)
+        run: |
+          pacman -Sy --noconfirm python-pip >/dev/null 2>&1 || true
+          pip install --break-system-packages --upgrade meson \
+            || pip install --upgrade meson \
+            || python -m pip install --upgrade meson
+          which meson && meson --version
+
       - name: Downloading source
         run: |
           cmake -DTARGET_ARCH=${{ env.arch }}-w64-mingw32 ${{ env.gcc_arch }} -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON --fresh -G Ninja -B build_$BIT -S $PWD
