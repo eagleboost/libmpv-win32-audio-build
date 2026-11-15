@@ -21,8 +21,9 @@ execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpmachine OUTPUT_VARIABLE HOST_AR
 string(REGEX MATCH "^[^-]+" HOST_CPU ${HOST_ARCH})
 
 execute_process(COMMAND meson --version OUTPUT_VARIABLE MESON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-if(NOT MESON_VERSION GREATER_EQUAL 1.3)
-    message(FATAL_ERROR "Meson 1.3.0 or greater is required. Install it with pip instead.")
+string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" MESON_VER_MATCH ${MESON_VERSION})
+if(NOT MESON_VER_MATCH OR CMAKE_MATCH_1 LESS 1 OR (CMAKE_MATCH_1 EQUAL 1 AND CMAKE_MATCH_2 LESS 3))
+    message(FATAL_ERROR "Meson 1.3.0 or greater is required (found: ${MESON_VERSION}). Install it with pip instead.")
 endif()
 
 if(TARGET_CPU STREQUAL "x86_64")
