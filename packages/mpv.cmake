@@ -14,7 +14,9 @@ ExternalProject_Add(mpv
     GIT_REPOSITORY https://github.com/mpv-player/mpv.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
-    UPDATE_COMMAND ""
+    # audio_metrics injection runs on every build (idempotent) so it is never
+    # skipped when the toolchain / repository caches restore an older stamp.
+    UPDATE_COMMAND ${CMAKE_COMMAND} -E env python3 ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/inject_audio_metrics.py <SOURCE_DIR>
     CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup <BINARY_DIR> <SOURCE_DIR>
         --prefix=${MINGW_INSTALL_PREFIX}
         --libdir=${MINGW_INSTALL_PREFIX}/lib
