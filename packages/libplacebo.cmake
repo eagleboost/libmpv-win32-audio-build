@@ -4,10 +4,10 @@ ExternalProject_Add(libplacebo
     DEPENDS
         vulkan
         shaderc
+        spirv-cross
         lcms2
         glad
         fast_float
-        libdovi
         xxhash
     GIT_REPOSITORY https://github.com/haasn/libplacebo.git
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -24,6 +24,7 @@ ExternalProject_Add(libplacebo
         --libdir=${MINGW_INSTALL_PREFIX}/lib
         --cross-file=${MESON_CROSS}
         --default-library=static
+        -Dd3d11=enabled
         -Ddebug=true
         -Db_ndebug=true
         -Doptimization=3

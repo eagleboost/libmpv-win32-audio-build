@@ -1,3 +1,5 @@
+# Audio-only libmpv build (VoyTrace flavor, based on shinchiro mpv-winbuild-cmake)
+# with the audio_metrics (FFT spectrum + PCM tap) injection in UPDATE_COMMAND.
 ExternalProject_Add(mpv
     DEPENDS
         ffmpeg
@@ -15,7 +17,7 @@ ExternalProject_Add(mpv
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
     # audio_metrics injection runs on every build (idempotent) so it is never
-    # skipped when the toolchain / repository caches restore an older stamp.
+    # skipped when caches restore an older stamp.
     UPDATE_COMMAND ${CMAKE_COMMAND} -E env python3 ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/inject_audio_metrics.py <SOURCE_DIR>
     CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup <BINARY_DIR> <SOURCE_DIR>
         --prefix=${MINGW_INSTALL_PREFIX}
@@ -29,8 +31,6 @@ ExternalProject_Add(mpv
         -Db_lto=true
         ${mpv_lto_mode}
         -Dgpl=false
-        -Db_lto=true
-        -Db_ndebug=true
         -Dlibmpv=true
         -Dpdf-build=enabled
         -Dlua=disabled
@@ -41,6 +41,7 @@ ExternalProject_Add(mpv
         -Dgl=disabled
         -Dspirv-cross=disabled
         -Degl-angle=disabled
+        -Dc_args='-Wno-error=int-conversion'
     BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
@@ -64,10 +65,10 @@ ExternalProject_Add_Step(mpv copy-binary
     ${mpv_copy_debug}
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv-2.dll          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv-2.dll
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv.dll.a          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv.dll.a
-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/libmpv/client.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/client.h
-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/libmpv/stream_cb.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/stream_cb.h
-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/libmpv/render.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render.h
-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/libmpv/render_gl.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render_gl.h
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/client.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/client.h
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/stream_cb.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/stream_cb.h
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/render.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render.h
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/render_gl.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render_gl.h
     COMMENT "Copying mpv binaries and manual"
 )
 
@@ -75,7 +76,7 @@ set(RENAME ${CMAKE_CURRENT_BINARY_DIR}/mpv-prefix/src/rename.sh)
 file(WRITE ${RENAME}
 "#!/bin/bash
 cd $1
-GIT=$(git rev-parse --short=7 HEAD)
+GIT=$(git rev-parse --short=10 HEAD)
 mv $2 $2-git-\${GIT}")
 
 ExternalProject_Add_Step(mpv copy-package-dir

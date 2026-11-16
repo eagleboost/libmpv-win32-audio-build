@@ -5,6 +5,7 @@ list(APPEND ep
     xz
     lzo
     uchardet
+    libsamplerate
     rubberband
     zlib
     zstd
@@ -45,6 +46,7 @@ list(APPEND ep
     fontconfig
     libunibreak
     libass
+    subrandr
     libvpl
     amf-headers
     avisynth-headers
@@ -78,18 +80,22 @@ list(APPEND ep
     shaderc
     glad
     fast_float
-    libdovi
-    rav1e
+    svtav1
     libplacebo
     libva
     libzvbi
     libaribcaption
     libsixel
     ffmpeg
+    ngtcp2
+    nghttp3
+    nghttp2
+    c-ares
+    libpsl
+    curl
     mpv
     mpv-release
     mpv-packaging
-    curl
     flac
     opusfile
     libopusenc
@@ -101,7 +107,6 @@ list(APPEND ep
     libuv
     libsodium
     megasdk
-    mesa
 )
 foreach(package IN LISTS ep)
     if(NOT ${SINGLE_SOURCE_LOCATION} STREQUAL "")
@@ -119,7 +124,7 @@ list(LENGTH ep ep_length)
 message(STATUS "Parsing ${ep_length} packages")
 
 # Exclude packages which dont depend on mpv when update
-list(APPEND removed "flac" "opusfile" "libopusenc" "opus-tools" "termcap" "readline" "cryptopp" "sqlite" "libuv" "libsodium" "megasdk" "libsixel" "curl" "libressl" "mbedtls" "nettle" "gmp" "mesa")
+list(APPEND removed "flac" "opusfile" "libopusenc" "opus-tools" "termcap" "readline" "cryptopp" "sqlite" "libuv" "libsodium" "megasdk" "libsixel" "curl" "libressl" "mbedtls" "nettle" "gmp")
 list(REMOVE_ITEM repo ${removed})
 list(REMOVE_ITEM ep ${removed})
 list(TRANSFORM repo APPEND "-force-update" OUTPUT_VARIABLE update)
@@ -141,7 +146,7 @@ add_custom_target(package-fullclean
 )
 
 add_custom_target(cargo-clean
-    COMMAND ${EXEC} cargo install --git https://github.com/matthiaskrgr/cargo-cache.git --no-default-features --features ci-autoclean cargo-cache
+    COMMAND ${EXEC} LD_PRELOAD= cargo install --git https://github.com/matthiaskrgr/cargo-cache.git --no-default-features --features ci-autoclean cargo-cache
     COMMAND ${EXEC} cargo-cache
     COMMAND du -sh ${RUSTUP_LOCATION}
     USES_TERMINAL

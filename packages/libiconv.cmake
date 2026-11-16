@@ -3,7 +3,6 @@ if(CYGWIN OR MSYS)
 endif()
 
 # libarchive required 3rd party iconv.pc when linking
-# 1.19.1: fixes mbrtowc conflicting types with newer mingw-w64 headers.
 set(VERSION "1.19.1")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libiconv.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libiconv.pc @ONLY)
 
