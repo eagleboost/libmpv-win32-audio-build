@@ -104,6 +104,16 @@ jobs:
             || python -m pip install --upgrade meson
           which meson && meson --version
 
+      - name: Pinning CMake 3.31 (ExternalProject patch incompatible with CMake 4.x)
+        run: |
+          curl -L --retry 5 -o /tmp/cmake.tgz https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-linux-x86_64.tar.gz
+          tar -xzf /tmp/cmake.tgz -C /opt
+          ln -sf /opt/cmake-3.31.6-linux-x86_64/bin/cmake /usr/local/bin/cmake
+          ln -sf /opt/cmake-3.31.6-linux-x86_64/bin/ctest /usr/local/bin/ctest
+          ln -sf /opt/cmake-3.31.6-linux-x86_64/bin/cpack /usr/local/bin/cpack
+          hash -r
+          which cmake && cmake --version
+
       - name: Downloading source
         run: |
           cmake -DTARGET_ARCH=${{ env.arch }}-w64-mingw32 ${{ env.gcc_arch }} -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON --fresh -G Ninja -B build_$BIT -S $PWD
