@@ -1,28 +1,10 @@
-execute_process(
-    COMMAND mkdir -p cmake
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/modules.tar.gz")
-    execute_process(
-        COMMAND curl -sL https://gitlab.kitware.com/cmake/cmake/-/archive/release/cmake-release.tar.gz?path=Modules/ExternalProject -o modules.tar.gz
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-    execute_process(
-        COMMAND tar -C ${CMAKE_CURRENT_BINARY_DIR}/cmake --strip-components=1 -xf modules.tar.gz
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-endif()
-
-if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/cmake/Modules/ExternalProject.cmake")
-    execute_process(
-        COMMAND curl -sLO https://gitlab.kitware.com/cmake/cmake/-/raw/v3.26.4/Modules/ExternalProject.cmake
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/Modules
-    )
-    execute_process(
-        COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/packages/cmake-0001-ExternalProject-changes.patch
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake
-    )
-endif()
-
-include(${CMAKE_CURRENT_BINARY_DIR}/cmake/Modules/ExternalProject.cmake)
+# Vendored CMake 3.26.4 ExternalProject module with the shinchiro patch
+# (GIT_CLONE_FLAGS / GIT_CLONE_POST_COMMAND / GIT_RESET support) already applied.
+#
+# The previous implementation downloaded CMake's ExternalProject module at
+# configure time from gitlab.kitware.com (the 'release' branch archive) — that
+# endpoint now returns HTTP 403, and falling back to raw v3.26.4 files left the
+# patched ExternalProject.cmake paired with the installed CMake's (4.x)
+# gitclone.cmake.in template, breaking every GIT_REPOSITORY download with
+# `math cannot parse "1 + "`. Vendoring removes the runtime dependency.
+include(${CMAKE_CURRENT_LIST_DIR}/vendored/Modules/ExternalProject.cmake)
