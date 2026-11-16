@@ -39,9 +39,34 @@ if(error_code)
   message(FATAL_ERROR "Failed to clone repository: '@git_repository@'")
 endif()
 
+# Branch fallback: many upstream projects renamed their default branch from
+# master to main. When the configured tag does not resolve, fall back to the
+# remote's HEAD (its current default branch).
+set(git_checkout_ref "@git_tag@")
+execute_process(
+  COMMAND "@git_EXECUTABLE@" rev-parse --verify --quiet "@git_tag@^{commit}"
+  WORKING_DIRECTORY "@work_dir@/@src_name@"
+  RESULT_VARIABLE _tag_missing
+  OUTPUT_QUIET
+)
+if(NOT _tag_missing EQUAL 0)
+  execute_process(
+    COMMAND "@git_EXECUTABLE@" symbolic-ref --short refs/remotes/origin/HEAD
+    WORKING_DIRECTORY "@work_dir@/@src_name@"
+    RESULT_VARIABLE _head_ok
+    OUTPUT_VARIABLE _origin_head
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(_head_ok EQUAL 0 AND NOT "${_origin_head}" STREQUAL "")
+    string(REGEX REPLACE "^origin/" "" git_checkout_ref "${_origin_head}")
+    message(STATUS "Tag '@git_tag@' not found, falling back to default branch '${git_checkout_ref}'")
+  endif()
+endif()
+
 execute_process(
   COMMAND "@git_EXECUTABLE@" @git_options@
-          checkout "@git_tag@" @git_checkout_explicit--@
+          checkout "${git_checkout_ref}" @git_checkout_explicit--@
   WORKING_DIRECTORY "@work_dir@/@src_name@"
   RESULT_VARIABLE error_code
 )
