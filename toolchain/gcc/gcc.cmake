@@ -5,9 +5,6 @@ ExternalProject_Add(gcc
          https://mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-14.4.0/gcc-14.4.0.tar.xz
          https://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-14.4.0/gcc-14.4.0.tar.xz
     URL_HASH SHA512=725ed8bdd43ef1726ffe8b5e8615a13e247fac9575b7626ae013a2975d000ea213212dc414b2f2631ac4785c1c8beca85555222faf9904d3b2fa6a3807a83a15
-    # gcc 14's libcody does not compile with GCC16 host compilers
-    # (backport of upstream 07a767c7a50d, via openwrt).
-    PATCH_COMMAND patch -p1 -l -i ${CMAKE_CURRENT_SOURCE_DIR}/gcc/gcc-13-libcody-cxx26.patch
     DOWNLOAD_DIR ${SOURCE_LOCATION}
     CONFIGURE_COMMAND <SOURCE_DIR>/configure
         --target=${TARGET_ARCH}
