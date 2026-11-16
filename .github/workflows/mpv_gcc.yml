@@ -66,21 +66,26 @@ jobs:
         with:
           ref: master
 
-      - name: Loading ${{ matrix.bit }} toolchain cache
-        uses: actions/cache/restore@main
-        with:
-          path: build_${{ matrix.bit }}
-          key: ${{ secrets.CACHE_VERSION }}-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
-          restore-keys: |
-            ${{ secrets.CACHE_VERSION }}-gcc-${{ matrix.bit }}_toolchain
+      # Caches disabled in this fork: upstream saves build stamps (toolchain
+      # cache) but never the matching src_packages source cache, so a restore
+      # after a failed run skips source downloads that the stamps claim are
+      # done (e.g. mingw-w64-crt autoreconf: "No such file or directory").
+      # Without a CACHE_VERSION secret the staleness window is uncontrollable.
+      # - name: Loading ${{ matrix.bit }} toolchain cache
+      #   uses: actions/cache/restore@main
+      #   with:
+      #     path: build_${{ matrix.bit }}
+      #     key: ${{ secrets.CACHE_VERSION }}-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
+      #     restore-keys: |
+      #       ${{ secrets.CACHE_VERSION }}-gcc-${{ matrix.bit }}_toolchain
 
-      - name: Loading repository cache
-        uses: actions/cache/restore@main
-        with:
-          path: src_packages
-          key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
-          restore-keys: |
-            ${{ secrets.CACHE_VERSION }}-repository
+      # - name: Loading repository cache
+      #   uses: actions/cache/restore@main
+      #   with:
+      #     path: src_packages
+      #     key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
+      #     restore-keys: |
+      #       ${{ secrets.CACHE_VERSION }}-repository
 
       - name: Loading rustup cache
         uses: actions/cache/restore@main
@@ -173,19 +178,20 @@ jobs:
         run: |
           ninja -C build_$BIT cargo-clean
 
-      - name: Saving ${{ matrix.bit }} toolchain cache
-        uses: actions/cache/save@main
-        if: always()
-        with:
-          path: build_${{ matrix.bit }}
-          key: ${{ secrets.CACHE_VERSION }}-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
+      # Disabled — see the note at the restore steps above.
+      # - name: Saving ${{ matrix.bit }} toolchain cache
+      #   uses: actions/cache/save@main
+      #   if: always()
+      #   with:
+      #     path: build_${{ matrix.bit }}
+      #     key: ${{ secrets.CACHE_VERSION }}-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
 
-      - name: Saving repository cache
-        uses: actions/cache/save@main
-        if: false
-        with:
-          path: src_packages
-          key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
+      # - name: Saving repository cache
+      #   uses: actions/cache/save@main
+      #   if: false
+      #   with:
+      #     path: src_packages
+      #     key: ${{ secrets.CACHE_VERSION }}-repository-${{ github.run_id }}
 
       - name: Saving release_${{ matrix.bit }} cache
         uses: actions/cache/save@main
