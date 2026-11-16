@@ -2,12 +2,12 @@ ExternalProject_Add(gcc
     DEPENDS
         mingw-w64-headers
     # 13-20231111 snapshot was pruned from all GCC mirrors (snapshots only
-    # keep the latest weeks). Switch to the 13.3.0 release tarball — stable
-    # ftp.gnu.org URL, never pruned.
-    URL https://ftp.gnu.org/gnu/gcc/gcc-13.3.0/gcc-13.3.0.tar.xz
-         https://mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-13.3.0/gcc-13.3.0.tar.xz
-         https://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-13.3.0/gcc-13.3.0.tar.xz
-    URL_HASH SHA512=ed5f2f4c6ed2c796fcf2c93707159e9dbd3ddb1ba063d549804dd68cdabbb6d550985ae1c8465ae9a336cfe29274a6eb0f42e21924360574ebd8e5d5c7c9a801
+    # keep the latest weeks) and gcc 13 does not build with GCC16 host
+    # compilers. gcc 15.2.0 release builds fine (with the libcody patch).
+    URL https://ftp.gnu.org/gnu/gcc/gcc-15.2.0/gcc-15.2.0.tar.xz
+         https://mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-15.2.0/gcc-15.2.0.tar.xz
+         https://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-15.2.0/gcc-15.2.0.tar.xz
+    URL_HASH SHA512=89047a2e07bd9da265b507b516ed3635adb17491c7f4f67cf090f0bd5b3fc7f2ee6e4cc4008beef7ca884b6b71dffe2bb652b21f01a702e17b468cca2d10b2de
     # gcc 13's libcody does not compile with GCC16 host compilers
     # (backport of upstream 07a767c7a50d, via openwrt).
     PATCH_COMMAND patch -p1 -l -i ${CMAKE_CURRENT_SOURCE_DIR}/gcc/gcc-13-libcody-cxx26.patch
