@@ -1,11 +1,13 @@
 ExternalProject_Add(gcc
     DEPENDS
         mingw-w64-headers
-    URL https://mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/13-20231111/gcc-13-20231111.tar.xz
-         https://sourceware.org/pub/gcc/snapshots/13-20231111/gcc-13-20231111.tar.xz
-         https://ftp.fu-berlin.de/unix/languages/gcc/snapshots/13-20231111/gcc-13-20231111.tar.xz
-    # https://mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/12-20221217/sha512.sum
-    URL_HASH SHA512=6f62981040894fdc98fff57295608092b917fe909cd67477c9ffc81197e5780ebabe1fbb4113e792ea441e0adb79fec5f802cda807632945c36ea295d623f19f
+    # 13-20231111 snapshot was pruned from all GCC mirrors (snapshots only
+    # keep the latest weeks). Switch to the 13.3.0 release tarball — stable
+    # ftp.gnu.org URL, never pruned.
+    URL https://ftp.gnu.org/gnu/gcc/gcc-13.3.0/gcc-13.3.0.tar.xz
+         https://mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-13.3.0/gcc-13.3.0.tar.xz
+         https://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-13.3.0/gcc-13.3.0.tar.xz
+    URL_HASH SHA512=ed5f2f4c6ed2c796fcf2c93707159e9dbd3ddb1ba063d549804dd68cdabbb6d550985ae1c8465ae9a336cfe29274a6eb0f42e21924360574ebd8e5d5c7c9a801
     DOWNLOAD_DIR ${SOURCE_LOCATION}
     CONFIGURE_COMMAND <SOURCE_DIR>/configure
         --target=${TARGET_ARCH}
