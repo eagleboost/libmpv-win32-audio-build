@@ -143,6 +143,9 @@ jobs:
           rm -rf build_$BIT/mpv-debug*; ninja -C build_$BIT mpv-packaging; mv build_$BIT/mpv*.7z release_$BIT
 
       - name: Copying ffmpeg
+        # ffmpeg.exe only exists in full builds; the audio-only ffmpeg in this
+        # fork is configured with --disable-programs.
+        continue-on-error: true
         run: |
           hash=$(git -C src_packages/ffmpeg rev-parse --short HEAD)
           7z a -m0=lzma2 -mx=9 -ms=on release_$BIT/ffmpeg-${{ env.arch }}${{ env.x86_64_level }}-git-$hash.7z ./build_$BIT/install/mingw/bin/ffmpeg.exe
