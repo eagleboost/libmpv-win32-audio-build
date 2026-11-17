@@ -46,7 +46,6 @@ ExternalProject_Add(ffmpeg
         --disable-protocols
         --disable-filters
         --disable-doc
-        --disable-postproc
         --disable-programs
         --disable-gray
         --disable-swscale-alpha
