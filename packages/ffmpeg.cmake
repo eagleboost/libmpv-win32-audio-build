@@ -1,25 +1,24 @@
+# Audio-only FFmpeg (LGPL) for the VoyTrace libmpv build.
+# Source config follows current shinchiro/mpv-winbuild-cmake (master + sparse
+# checkout, no patch series); configure flags restore the media-kit audio-only
+# trim so libmpv-2.dll stays small (--disable-gpl keeps the build LGPL).
 ExternalProject_Add(ffmpeg
     DEPENDS
-        amf-headers
         bzip2
         lame
-        libass
         libpng
         libsoxr
-        libwebp
-        libzimg
         libmysofa
         harfbuzz
         opus
         speex
         vorbis
         libxml2
-        libvpl
         mbedtls
     GIT_REPOSITORY https://github.com/FFmpeg/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_TAG ea3d24bbe3c58b171e55fe2151fc7ffaca3ab3d2
-    PATCH_COMMAND ${EXEC} git apply ${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg-*.patch
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests/ref/fate"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC} CONF=1 <SOURCE_DIR>/configure
         --cross-prefix=${TARGET_ARCH}-
@@ -29,7 +28,6 @@ ExternalProject_Add(ffmpeg
         --pkg-config-flags=--static
         --enable-cross-compile
         --enable-runtime-cpudetect
-        ${ffmpeg_hardcoded_tables}
 
         --disable-gpl
         --disable-nonfree
@@ -66,7 +64,6 @@ ExternalProject_Add(ffmpeg
         --disable-vaapi
         --disable-vdpau
         --disable-bzlib
-        --disable-libmfx
         --disable-libuavs3d
         --disable-ffnvcodec
         --disable-linux-perf
@@ -76,7 +73,6 @@ ExternalProject_Add(ffmpeg
         --enable-small
         --enable-hwaccels
         --enable-optimizations
-        --enable-runtime-cpudetect
 
         --enable-mbedtls
 
@@ -117,6 +113,7 @@ ExternalProject_Add(ffmpeg
         --enable-decoder=dsd*
         --enable-decoder=dca
 
+        # embedded-cover decoders (album art in tags/containers)
         --enable-decoder=mjpeg
         --enable-decoder=ljpeg
         --enable-decoder=jpegls
@@ -126,7 +123,6 @@ ExternalProject_Add(ffmpeg
         --enable-decoder=bmp
         --enable-decoder=tiff
         --enable-decoder=webp
-        --enable-decoder=jpegls
 
         --enable-demuxer=aac
         --enable-demuxer=ac3
@@ -154,7 +150,6 @@ ExternalProject_Add(ffmpeg
         --enable-demuxer=dsf
         --enable-demuxer=dts
         --enable-demuxer=truehd
-        --enable-demuxer=dts
         --enable-demuxer=dtshd
 
         --enable-parser=aac*
@@ -197,13 +192,12 @@ ExternalProject_Add(ffmpeg
         --enable-encoder=jpegls
         --enable-encoder=jpeg2000
         --enable-encoder=png
-        --enable-encoder=jpegls
 
         --enable-network
 
         ${ffmpeg_lto}
         --extra-cflags='-Wno-error=int-conversion'
-        "--extra-libs='${ffmpeg_extra_libs}'" # -lstdc++ / -lc++ needs by libjxl and shaderc
+        "--extra-libs='${ffmpeg_extra_libs}'"
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
